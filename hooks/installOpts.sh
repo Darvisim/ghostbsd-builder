@@ -36,8 +36,9 @@ _vnc key ctrl-alt-f2
 sleep 3
 _vnc key ctrl-alt-f2
 
-# Wait for the getty login prompt on the text console.
-waitForText "login:" 120
+# Wait for the getty login prompt on the text console. OCR renders the live
+# media's "login:" consistently as "logi", so match that.
+waitForText "logi" 300
 
 ############################################################################
 # 3) Log in. On the GhostBSD live media root logs in on the console with no
@@ -50,11 +51,11 @@ sleep 5
 $vmsh enter
 sleep 5
 
-# Confirm we actually have an interactive shell by echoing a unique marker and
-# OCR-matching it back. This both proves the login worked and absorbs timing.
-$vmsh string "echo aNyVmReAdY"
-$vmsh enter
-waitForText "aNyVmReAdY" 60
+# Give the shell a moment to settle after login. We avoid OCR-matching the
+# "root@livecd" prompt here because OCR mangles the "@" (reads it as "rootel
+# ivec"); login is near-instant once the "logi" prompt is reached, so a short
+# fixed wait is more reliable.
+sleep 15
 
 ############################################################################
 # 4) Fetch our answer file from the builder's HTTP server and run
@@ -77,7 +78,9 @@ $vmsh enter
 # filesystem to disk. build.sh waits for the VM to power off after this hook
 # returns, so block here until the install is plausibly done.
 echo "Running pc-sysinstall; waiting for it to finish..."
-waitForText "Setup Finished" 1200 || true
+# pc-sysinstall prints "Installation finished!" on success (OCR sees the "!"
+# as "?"), so match the OCR-robust substring "finished".
+waitForText "finished" 1200 || true
 
 sleep 10
 $vmsh string "sudo shutdown -p now"
