@@ -38,6 +38,6 @@ How to build:
 
     Just clone the repo. and run:
     ```bash
-    bash build.sh conf/ghostbsd-26.1.conf
+    python3 build.py conf/ghostbsd-26.1.conf
     ```
    
