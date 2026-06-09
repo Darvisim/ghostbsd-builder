@@ -21,11 +21,6 @@
 # network probe is gone.
 _cfg_url = "http://192.168.122.1:8000/conf/pcinstall.cfg"
 
-# Trailing shell-comment pad. vncdotool occasionally drops the last few chars
-# it types under load; appending a comment pad guarantees a tail-drop eats the
-# pad rather than the real command or filename.
-_pad = "          #zzzzzzzzzzzzzzzz"
-
 ############################################################################
 # 1) Reach a text-console login prompt.
 #
@@ -61,18 +56,18 @@ time.sleep(15)
 #    is idempotent) to ride out a transient hiccup just after the live
 #    network comes up.
 ############################################################################
-string("sudo fetch -o /tmp/pcinstall.cfg %s%s" % (_cfg_url, _pad))
+string("sudo fetch -o /tmp/pcinstall.cfg %s" % _cfg_url)
 enter()
 time.sleep(12)
-string("sudo fetch -o /tmp/pcinstall.cfg %s%s" % (_cfg_url, _pad))
+string("sudo fetch -o /tmp/pcinstall.cfg %s" % _cfg_url)
 enter()
 time.sleep(8)
 # Show the config in the build log for debugging.
-string("cat /tmp/pcinstall.cfg%s" % _pad)
+string("cat /tmp/pcinstall.cfg")
 enter()
 time.sleep(3)
 
-string("sudo /usr/local/sbin/pc-sysinstall -c /tmp/pcinstall.cfg%s" % _pad)
+string("sudo /usr/local/sbin/pc-sysinstall -c /tmp/pcinstall.cfg")
 enter()
 
 # Give pc-sysinstall time to partition, create the pool and clone the live
@@ -84,5 +79,5 @@ log("Running pc-sysinstall; waiting for it to finish...")
 waitForText("finished", "1200")
 
 time.sleep(10)
-string("sudo shutdown -p now%s" % _pad)
+string("sudo shutdown -p now")
 enter()
